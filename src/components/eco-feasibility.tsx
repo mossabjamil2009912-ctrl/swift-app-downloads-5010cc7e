@@ -32,6 +32,12 @@ const hourLabel = (h: number) => {
 const nf = (n: number, d = 0) => n.toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
 
 const PROJECT_KEY = "actes_eco_project";
+// حفظ آخر أحمال مُدخلة في التخزين المحلي لتبقى عند الدخول مجدداً
+const LOADS_KEY = "actes_eco_loads";
+type SavedLoads = { values?: string[]; price?: string; daily?: string; total?: string; one?: string };
+const readLoads = (): SavedLoads => { try { const s = JSON.parse(localStorage.getItem(LOADS_KEY) ?? "{}") as SavedLoads; if (Array.isArray(s.values) && s.values.length === 24) return s; } catch { /* ignore */ } return {}; };
+const saveLoads = (patch: SavedLoads) => { try { const cur = readLoads(); localStorage.setItem(LOADS_KEY, JSON.stringify({ ...cur, ...patch })); } catch { /* ignore */ } };
+const clearLoads = () => { try { localStorage.removeItem(LOADS_KEY); } catch { /* ignore */ } };
 const DAY_SHARE = [1, 1, 1, 1, 1, 1.2, 1.6, 2.4, 3, 3.2, 3.3, 3.3, 3.2, 3.2, 3.2, 3.1, 2.9, 2.6, 2.4, 2.2, 1.9, 1.6, 1.3, 1.1];
 
 type Goal = "reduce" | "free";
@@ -93,10 +99,14 @@ export function EcoFeasibility({ mode, onSales, onBuy }: { mode: Mode; onSales?:
   const [step, setStep] = useState<"name" | "data" | "goal" | "result">("name");
   const [project, setProject] = useState("");
   useEffect(() => { try { setProject(sessionStorage.getItem(PROJECT_KEY) ?? ""); } catch { /* ignore */ } }, []);
-  const [values, setValues] = useState<string[]>(() => Array(24).fill(""));
-  const [price, setPrice] = useState("1.1");
+  const [values, setValues] = useState<string[]>(() => readLoads().values ?? Array(24).fill(""));
+  const [price, setPrice] = useState(() => readLoads().price ?? "1.1");
   const [same, setSame] = useState(false);
-  const [daily, setDaily] = useState("");
+  const [daily, setDaily] = useState(() => readLoads().daily ?? "");
+  useEffect(() => { saveLoads({ values }); }, [values]);
+  useEffect(() => { saveLoads({ price }); }, [price]);
+  useEffect(() => { saveLoads({ daily }); }, [daily]);
+  const resetData = () => { clearLoads(); setValues(Array(24).fill("")); setDaily(""); setPrice("1.1"); setSame(false); };
   const [goal, setGoal] = useState<Goal>("reduce");
   const [pick, setPick] = useState(1);
   const [open, setOpen] = useState<number | null>(null);
@@ -168,9 +178,10 @@ export function EcoFeasibility({ mode, onSales, onBuy }: { mode: Mode; onSales?:
           <span className="text-xs font-bold">سعر لتر الديزل بالدولار</span>
           <input inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} className="rounded-md border border-border bg-background px-3 py-2 text-sm tabular-nums" />
         </label>
-        <p className="mt-3 text-xs text-muted-foreground">تم إدخال {filled} من 24 خانة</p>
+        <p className="mt-3 text-xs text-muted-foreground">تم إدخال {filled} من 24 خانة — تُحفظ البيانات تلقائياً وتبقى عند الدخول مجدداً</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <button type="submit" disabled={filled !== 24} className="rounded-md bg-skyline px-6 py-3 text-sm font-bold text-skyline-foreground disabled:opacity-50">متابعة</button>
+          <button type="button" onClick={resetData} className="rounded-md border border-destructive/40 px-4 py-2 text-xs font-bold text-destructive hover:bg-destructive/10">مسح وإعادة إدخال البيانات</button>
           <button type="button" onClick={() => setStep("name")} className="rounded-md border border-border px-4 py-2 text-xs font-bold">رجوع</button>
         </div>
       </form>
@@ -275,9 +286,11 @@ export function EcoSystemStudy({ onSales }: { onSales?: () => void }) {
   useEffect(() => { try { setProject(sessionStorage.getItem(PROJECT_KEY) ?? ""); } catch { /* ignore */ } }, []);
   useEffect(() => { toTop(); }, [done, named]);
   const [lm, setLm] = useState<"loads" | "diesel">("loads");
-  const [hrs, setHrs] = useState<string[]>(() => Array(24).fill(""));
-  const [total, setTotal] = useState("");
-  const [one, setOne] = useState("");
+  const [hrs, setHrs] = useState<string[]>(() => readLoads().values ?? Array(24).fill(""));
+  const [total, setTotal] = useState(() => readLoads().total ?? "");
+  const [one, setOne] = useState(() => readLoads().one ?? "");
+  useEffect(() => { saveLoads({ values: hrs, total, one }); }, [hrs, total, one]);
+  const resetHrs = () => { clearLoads(); setHrs(Array(24).fill("")); setTotal(""); setOne(""); };
   const [showReport, setShowReport] = useState(false);
   const [merge, setMerge] = useState(false);
   const [pf, setPf] = useState({ panel: "", panelW: "", panelN: "", inv: "", invKw: "", invN: "", bat: "", batKwh: "", batN: "" });
@@ -319,7 +332,7 @@ export function EcoSystemStudy({ onSales }: { onSales?: () => void }) {
   const fixedInv = cab && f.batKwh === "260";
   const QUICK: Partial<Record<keyof typeof f, string[]>> = {
     panel: ["Suntech 720W", "Suntech 595W"], panelW: ["720", "595"],
-    inv: ["Deye", "Solis"], invKw: cab && (f.batKwh === "313" || f.batKwh === "112") ? ["50", "80", "125"] : ["12", "50", "125"],
+    inv: ["Deye", "Solis", "Huawei"], invKw: cab && (f.batKwh === "313" || f.batKwh === "112") ? ["50", "80", "125"] : ["12", "50", "125"],
     bat: ["Pylontech", "HiTHIUM"], batKwh: cab ? cabKwh : ["5.12", "16"],
   };
   const pickQuick = (k: keyof typeof f, q: string) => {
@@ -389,7 +402,10 @@ export function EcoSystemStudy({ onSales }: { onSales?: () => void }) {
           {field("price", "سعر لتر الديزل ($)", "1.1", true)}
         </div>
         <div className="mt-5 rounded-md border border-border bg-background p-4">
-          <p className="text-xs font-black">بيانات الأحمال <span className="font-normal text-muted-foreground">(مطلوب — لحساب التغطية والتوفير الفعلي)</span></p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs font-black">بيانات الأحمال <span className="font-normal text-muted-foreground">(مطلوب — لحساب التغطية والتوفير الفعلي؛ تُحفظ تلقائياً وتبقى عند الدخول مجدداً)</span></p>
+            <button type="button" onClick={resetHrs} className="rounded-md border border-destructive/40 px-3 py-1.5 text-[11px] font-bold text-destructive hover:bg-destructive/10">مسح وإعادة إدخال البيانات</button>
+          </div>
           <div className="mt-2 flex flex-wrap gap-2">
             {([["loads", "بيانات الأحمال (kW)"], ["diesel", "بيانات الديزل (لتر/ساعة)"]] as const).map(([k, l]) => (
               <button key={k} type="button" onClick={() => setLm(k)} className={`rounded-md border px-3 py-1.5 text-xs font-bold ${lm === k ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>{l}</button>
