@@ -39,9 +39,9 @@ function design(kw: number[], sys?: CustomSystem, target?: number) {
   const invBrand = sys ? sys.invName : unit >= 125 ? "Solis" : "Deye";
   const invTotal = sys ? unit * invN + (prev ? prev.invKw * prev.invN : 0) : unit * invN;
   const pvKw = sys ? Math.min(kwp, invTotal * 1.3) : kwp;
-  const panelLabel = sys ? `${panels} لوح ${sys.panelName} ${sys.panelW}W${prev && prevKwp > 0 ? ` + ${prev.panels} لوح ${prev.panelName} ${prev.panelW}W` : ""}` : `${panels} لوح سنتك ${PANEL_W}W`;
-  const newBatLabel = sys ? (newBat > 0 ? `${mods} ${sys.batKind === "cab" ? (mods > 2 && mods < 11 ? "كبائن" : "كابينة") : "بطارية"} ${sys.batName} ${sys.batUnit}kWh` : "بدون بطاريات") : mods === 0 ? "بدون بطاريات" : peak <= 16 ? `${mods} بطارية Pylontech ${smallBat}kWh` : `${racks} راك × ${mods} بطارية ${BAT_MOD}kWh`;
-  const batLabel = prev && prevBat > 0 ? `${newBatLabel} + ${prev.batN} بطارية ${prev.batName} ${prev.batUnit}kWh (سابقة)` : newBatLabel;
+  const panelLabel = sys ? `${panels} لوح ${wattClean(sys.panelName, sys.panelW)}${prev && prevKwp > 0 ? ` + ${prev.panels} لوح ${wattClean(prev.panelName, prev.panelW)}` : ""}` : `${panels} لوح سنتك ${PANEL_W}W`;
+  const newBatLabel = sys ? (newBat > 0 ? `${mods} ${sys.batKind === "cab" ? (mods > 2 && mods < 11 ? "كبائن" : "كابينة") : "بطارية"} ${kwhClean(sys.batName, sys.batUnit)}` : "بدون بطاريات") : mods === 0 ? "بدون بطاريات" : peak <= 16 ? `${mods} بطارية Pylontech ${smallBat}kWh` : `${racks} راك × ${mods} بطارية ${BAT_MOD}kWh`;
+  const batLabel = prev && prevBat > 0 ? `${newBatLabel} + ${prev.batN} بطارية ${kwhClean(prev.batName, prev.batUnit)} (سابقة)` : newBatLabel;
   // منحنى الإنتاج الشمسي (جيبي من 6 إلى 18)
   const shape = Array.from({ length: 24 }, (_, h) => (h >= 6 && h < 18 ? Math.sin((Math.PI * (h + 0.5 - 6)) / 12) : 0));
   const sSum = shape.reduce((a, b) => a + b, 0);
@@ -93,6 +93,10 @@ function econ(total: number, genE: number, capex: number, price: number) {
   const saving = savedL * 365 * price;
   return { baseL, newL, savedL, saving, months: saving > 0 ? (capex / saving) * 12 : null, net5: saving * 5 - capex, sav5: saving * 5, co2: (savedL * 365 * CO2_PER_L) / 1000, cut: baseL > 0 ? (savedL / baseL) * 100 : 0 };
 }
+
+/** منع تكرار الواط/الكيلوواط في اسم المنتج إن كان مضمناً فيه مسبقاً */
+const wattClean = (name: string, w: number) => (new RegExp(`\\b${w}\\s*(w|wp|واط|وات)\\b`, "i").test(name) ? name : `${name} ${w}W`);
+const kwhClean = (name: string, k: number) => (new RegExp(`\\b${k}\\s*(kwh|كيلو)`, "i").test(name) ? name : `${name} ${k}kWh`);
 
 const R = { red: "#e60012", ink: "#14171c", sub: "#6b7280", line: "#e5e7eb", paper: "#f7f8fa", mint: "#e8f5ee", green: "#15803d" };
 const LOGO = "/brand/actes-logo-report.png";
