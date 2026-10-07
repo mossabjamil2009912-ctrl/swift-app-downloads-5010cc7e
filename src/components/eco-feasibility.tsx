@@ -402,7 +402,10 @@ export function EcoSystemStudy({ onSales }: { onSales?: () => void }) {
           {field("price", "سعر لتر الديزل ($)", "1.1", true)}
         </div>
         <div className="mt-5 rounded-md border border-border bg-background p-4">
-          <p className="text-xs font-black">بيانات الأحمال <span className="font-normal text-muted-foreground">(مطلوب — لحساب التغطية والتوفير الفعلي)</span></p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs font-black">بيانات الأحمال <span className="font-normal text-muted-foreground">(مطلوب — لحساب التغطية والتوفير الفعلي؛ تُحفظ تلقائياً وتبقى عند الدخول مجدداً)</span></p>
+            <button type="button" onClick={resetHrs} className="rounded-md border border-destructive/40 px-3 py-1.5 text-[11px] font-bold text-destructive hover:bg-destructive/10">مسح وإعادة إدخال البيانات</button>
+          </div>
           <div className="mt-2 flex flex-wrap gap-2">
             {([["loads", "بيانات الأحمال (kW)"], ["diesel", "بيانات الديزل (لتر/ساعة)"]] as const).map(([k, l]) => (
               <button key={k} type="button" onClick={() => setLm(k)} className={`rounded-md border px-3 py-1.5 text-xs font-bold ${lm === k ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>{l}</button>
