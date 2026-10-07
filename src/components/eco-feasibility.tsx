@@ -99,10 +99,14 @@ export function EcoFeasibility({ mode, onSales, onBuy }: { mode: Mode; onSales?:
   const [step, setStep] = useState<"name" | "data" | "goal" | "result">("name");
   const [project, setProject] = useState("");
   useEffect(() => { try { setProject(sessionStorage.getItem(PROJECT_KEY) ?? ""); } catch { /* ignore */ } }, []);
-  const [values, setValues] = useState<string[]>(() => Array(24).fill(""));
-  const [price, setPrice] = useState("1.1");
+  const [values, setValues] = useState<string[]>(() => readLoads().values ?? Array(24).fill(""));
+  const [price, setPrice] = useState(() => readLoads().price ?? "1.1");
   const [same, setSame] = useState(false);
-  const [daily, setDaily] = useState("");
+  const [daily, setDaily] = useState(() => readLoads().daily ?? "");
+  useEffect(() => { saveLoads({ values }); }, [values]);
+  useEffect(() => { saveLoads({ price }); }, [price]);
+  useEffect(() => { saveLoads({ daily }); }, [daily]);
+  const resetData = () => { clearLoads(); setValues(Array(24).fill("")); setDaily(""); setPrice("1.1"); setSame(false); };
   const [goal, setGoal] = useState<Goal>("reduce");
   const [pick, setPick] = useState(1);
   const [open, setOpen] = useState<number | null>(null);
