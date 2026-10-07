@@ -186,6 +186,39 @@ export function EcoReport({ kw, price: price0, onBuy, onEdit, onSales, system, p
   const noBat = d.batKwh <= 0;
   const fmtM = (m: number | null) => m === null ? "—" : `${nf(Math.round(m * 10) / 10, 1)} شهراً`;
 
+  // صفوف مفصّلة عند دمج منظومة سابقة: جديدة / سابقة / إجمالي
+  const prevKwp = prevSys ? (prevSys.panels * prevSys.panelW) / 1000 : 0;
+  const newKwp = d.kwp - prevKwp;
+  const prevInvKw = prevSys ? prevSys.invKw * prevSys.invN : 0;
+  const prevBatKwh = prevSys ? prevSys.batUnit * prevSys.batN : 0;
+  const newBatKwh = d.batKwh - prevBatKwh;
+  const invTotalKw = d.invN * d.unit + prevInvKw;
+  const cabWord = (n: number) => (n > 2 && n < 11 ? "كبائن" : "كابينة");
+  const newPanelTxt = system ? `${d.panels} لوح ${wattClean(system.panelName, system.panelW)} — ${nf(newKwp, 2)} kWp` : d.panelLabel;
+  const panelRows: string[][] = prevSys
+    ? [
+        ["الألواح الجديدة (المضافة)", "لا يوجد", newPanelTxt],
+        ["الألواح السابقة (القائمة)", "—", `${prevSys.panels} لوح ${wattClean(prevSys.panelName, prevSys.panelW)} — ${nf(prevKwp, 2)} kWp`],
+        ["إجمالي القدرة الشمسية بعد الدمج", "0 kWp", `${d.panels + prevSys.panels} لوح — ${nf(d.kwp, 2)} kWp`],
+      ]
+    : [["الألواح الشمسية", "لا يوجد", d.panelLabel], ["قدرة الألواح", "0 kWp", `${nf(d.kwp, 2)} kWp`]];
+  const invRows: string[][] = prevSys
+    ? [
+        ["الإنفرترات الجديدة", "لا يوجد", `${d.invN} وحدة ${d.invBrand} × ${d.unit} kW (${nf(d.invN * d.unit)} kW)`],
+        ...(prevSys.invN > 0 ? [[`الإنفرترات السابقة`, "—", `${prevSys.invN} وحدة ${prevSys.invName} × ${prevSys.invKw} kW (${nf(prevInvKw)} kW)`]] : []),
+        ["إجمالي قدرة الإنفرترات", "0 kW", `${nf(invTotalKw)} kW`],
+      ]
+    : [["الإنفرترات", "لا يوجد", `${d.invN} وحدة ${d.invBrand} × ${d.unit} kW`]];
+  const batRows: string[][] = noBat
+    ? []
+    : prevSys
+      ? [
+          ["سعة التخزين الجديدة", "لا يوجد", system ? `${system.batN} ${system.batKind === "cab" ? cabWord(system.batN) : "بطارية"} ${kwhClean(system.batName, system.batUnit)} (${nf(newBatKwh)} kWh)` : d.batLabel],
+          ...(prevBatKwh > 0 ? [["سعة التخزين السابقة", "—", `${prevSys.batN} بطارية ${kwhClean(prevSys.batName, prevSys.batUnit)} (${nf(prevBatKwh)} kWh)`]] : []),
+          ["إجمالي سعة التخزين بعد الدمج", "0 kWh", `${nf(d.batKwh)} kWh (${nf(d.batKwh * DOD)} kWh عند ${DOD * 100}% DoD)`],
+        ]
+      : [["بطاريات الليثيوم", "لا يوجد", `${d.batLabel} — ${nf(d.batKwh)} kWh (${nf(d.batKwh * DOD)} kWh عند ${DOD * 100}% DoD)`]];
+
   const [busy, setBusy] = useState(false);
   const download = async () => {
     const node = ref.current; if (!node || busy) return;
