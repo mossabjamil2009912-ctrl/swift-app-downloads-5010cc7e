@@ -286,9 +286,11 @@ export function EcoSystemStudy({ onSales }: { onSales?: () => void }) {
   useEffect(() => { try { setProject(sessionStorage.getItem(PROJECT_KEY) ?? ""); } catch { /* ignore */ } }, []);
   useEffect(() => { toTop(); }, [done, named]);
   const [lm, setLm] = useState<"loads" | "diesel">("loads");
-  const [hrs, setHrs] = useState<string[]>(() => Array(24).fill(""));
-  const [total, setTotal] = useState("");
-  const [one, setOne] = useState("");
+  const [hrs, setHrs] = useState<string[]>(() => readLoads().values ?? Array(24).fill(""));
+  const [total, setTotal] = useState(() => readLoads().total ?? "");
+  const [one, setOne] = useState(() => readLoads().one ?? "");
+  useEffect(() => { saveLoads({ values: hrs, total, one }); }, [hrs, total, one]);
+  const resetHrs = () => { clearLoads(); setHrs(Array(24).fill("")); setTotal(""); setOne(""); };
   const [showReport, setShowReport] = useState(false);
   const [merge, setMerge] = useState(false);
   const [pf, setPf] = useState({ panel: "", panelW: "", panelN: "", inv: "", invKw: "", invN: "", bat: "", batKwh: "", batN: "" });
