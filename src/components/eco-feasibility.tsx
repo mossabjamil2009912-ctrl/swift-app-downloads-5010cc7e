@@ -32,6 +32,12 @@ const hourLabel = (h: number) => {
 const nf = (n: number, d = 0) => n.toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
 
 const PROJECT_KEY = "actes_eco_project";
+// حفظ آخر أحمال مُدخلة في التخزين المحلي لتبقى عند الدخول مجدداً
+const LOADS_KEY = "actes_eco_loads";
+type SavedLoads = { values?: string[]; price?: string; daily?: string; total?: string; one?: string };
+const readLoads = (): SavedLoads => { try { const s = JSON.parse(localStorage.getItem(LOADS_KEY) ?? "{}") as SavedLoads; if (Array.isArray(s.values) && s.values.length === 24) return s; } catch { /* ignore */ } return {}; };
+const saveLoads = (patch: SavedLoads) => { try { const cur = readLoads(); localStorage.setItem(LOADS_KEY, JSON.stringify({ ...cur, ...patch })); } catch { /* ignore */ } };
+const clearLoads = () => { try { localStorage.removeItem(LOADS_KEY); } catch { /* ignore */ } };
 const DAY_SHARE = [1, 1, 1, 1, 1, 1.2, 1.6, 2.4, 3, 3.2, 3.3, 3.3, 3.2, 3.2, 3.2, 3.1, 2.9, 2.6, 2.4, 2.2, 1.9, 1.6, 1.3, 1.1];
 
 type Goal = "reduce" | "free";
