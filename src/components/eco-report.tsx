@@ -317,20 +317,20 @@ export function EcoReport({ kw, price: price0, onBuy, onEdit, onSales, system, p
             <table className="w-full min-w-[520px] text-xs">
               <thead><tr className="bg-navy text-primary-foreground"><th className="p-2 text-right">بند المقارنة</th><th className="p-2 text-right">بدون منظومة</th><th className="p-2 text-right">المنظومة المقترحة (Solar + BESS)</th></tr></thead>
               <tbody>
-                {[
-                  ["نوع المنظومة", "مولدات ديزل فقط", noBat ? "منظومة شمسية On-Grid بدون بطاريات" : "منظومة هجينة متكاملة Solar + BESS"],
-                  ["الألواح الشمسية", "لا يوجد", d.panelLabel],
-                  ["قدرة الألواح", "0 kWp", `${nf(d.kwp, 2)} kWp`],
-                  ["الإنفرترات", "لا يوجد", `${d.invN} وحدة ${d.invBrand} × ${d.unit} kW`],
-                  ...(noBat ? [] : [["بطاريات الليثيوم", "لا يوجد", `${d.batLabel} — ${nf(d.batKwh)} kWh (${nf(d.batKwh * DOD)} kWh عند ${DOD * 100}% DoD)`]]),
-                  ...(d.custom || noBat ? [] : [["راكات التخزين", "لا يوجد", `${d.racks} راك`]]),
+                {([
+                  ["نوع المنظومة", "مولدات ديزل فقط", noBat ? "منظومة شمسية On-Grid بدون بطاريات" : prevSys ? "منظومة هجينة متكاملة Solar + BESS (جديدة + قائمة مدمجة)" : "منظومة هجينة متكاملة Solar + BESS"],
+                  ...panelRows,
+                  ...invRows,
+                  ...batRows,
+                  ...(d.custom || noBat || prevSys ? [] : [["راكات التخزين", "لا يوجد", `${d.racks} راك`]]),
                   ["ساعات تشغيل المولد", `${d.baseHours} ساعة/يوم`, `${d.genHours} ساعة/يوم`],
                   ["استهلاك الديزل اليومي", `${nf(e.baseL)} لتر`, `${nf(e.newL)} لتر/يوم`],
                   ["استهلاك الديزل السنوي", `${nf(e.baseL * 365)} لتر`, `${nf(e.newL * 365)} لتر (توفير ${nf(e.savedL * 365)} لتر)`],
                   ["التكلفة التشغيلية السنوية", `$${nf(e.baseL * 365 * price0)}`, `$${nf(e.newL * 365 * price0)} (توفير $${nf(e.saving)})`],
+                  ...(prevSys && ePrev ? [["الوفر السنوي الإضافي من المنظومة الجديدة", "—", `$${nf(e.saving)} (بعد خصم وفر المنظومة السابقة $${nf(ePrev.saving)})`]] : []),
                   ["نسبة التغطية النظيفة", "0%", `${nf(d.clean)}% (${nf(d.solarPct)}% شمس + ${nf(d.clean - d.solarPct)}% بطاريات)`],
-                  ["الاستثمار المطلوب", "$0", `$${nf(d.capex)} — استرداد خلال ${fmtM(e.months)}`],
-                ].map(([a, b, c], i) => (
+                  ["الاستثمار المطلوب", "$0", `$${nf(d.capex)} — استرداد خلال ${fmtM(e.months)}${prevSys ? " (المنظومة الجديدة فقط)" : ""}`],
+                ] as string[][]).map(([a, b, c], i) => (
                   <tr key={a} className={i % 2 ? "bg-muted/40" : ""}><td className="p-2 font-bold">{a}</td><td className="p-2 text-muted-foreground">{b}</td><td className="p-2 font-bold text-navy">{c}</td></tr>
                 ))}
               </tbody>
