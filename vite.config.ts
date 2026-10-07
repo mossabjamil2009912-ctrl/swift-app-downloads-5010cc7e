@@ -17,7 +17,7 @@ export default defineConfig({
       alias: {
         // qrcode's node entry pulls fs/pngjs and triggers createRequire(import.meta.url)
         // which crashes the Cloudflare worker at boot (import.meta.url is undefined there).
-        qrcode: "qrcode/lib/browser.js",
+        qrcode: `${process.cwd()}/node_modules/qrcode/lib/browser.js`,
       },
     },
   },
