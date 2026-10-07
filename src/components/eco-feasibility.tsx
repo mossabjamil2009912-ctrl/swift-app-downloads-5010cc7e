@@ -178,9 +178,10 @@ export function EcoFeasibility({ mode, onSales, onBuy }: { mode: Mode; onSales?:
           <span className="text-xs font-bold">سعر لتر الديزل بالدولار</span>
           <input inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} className="rounded-md border border-border bg-background px-3 py-2 text-sm tabular-nums" />
         </label>
-        <p className="mt-3 text-xs text-muted-foreground">تم إدخال {filled} من 24 خانة</p>
+        <p className="mt-3 text-xs text-muted-foreground">تم إدخال {filled} من 24 خانة — تُحفظ البيانات تلقائياً وتبقى عند الدخول مجدداً</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <button type="submit" disabled={filled !== 24} className="rounded-md bg-skyline px-6 py-3 text-sm font-bold text-skyline-foreground disabled:opacity-50">متابعة</button>
+          <button type="button" onClick={resetData} className="rounded-md border border-destructive/40 px-4 py-2 text-xs font-bold text-destructive hover:bg-destructive/10">مسح وإعادة إدخال البيانات</button>
           <button type="button" onClick={() => setStep("name")} className="rounded-md border border-border px-4 py-2 text-xs font-bold">رجوع</button>
         </div>
       </form>
