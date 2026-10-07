@@ -39,9 +39,9 @@ function design(kw: number[], sys?: CustomSystem, target?: number) {
   const invBrand = sys ? sys.invName : unit >= 125 ? "Solis" : "Deye";
   const invTotal = sys ? unit * invN + (prev ? prev.invKw * prev.invN : 0) : unit * invN;
   const pvKw = sys ? Math.min(kwp, invTotal * 1.3) : kwp;
-  const panelLabel = sys ? `${panels} لوح ${sys.panelName} ${sys.panelW}W${prev && prevKwp > 0 ? ` + ${prev.panels} لوح ${prev.panelName} ${prev.panelW}W` : ""}` : `${panels} لوح سنتك ${PANEL_W}W`;
-  const newBatLabel = sys ? (newBat > 0 ? `${mods} ${sys.batKind === "cab" ? (mods > 2 && mods < 11 ? "كبائن" : "كابينة") : "بطارية"} ${sys.batName} ${sys.batUnit}kWh` : "بدون بطاريات") : mods === 0 ? "بدون بطاريات" : peak <= 16 ? `${mods} بطارية Pylontech ${smallBat}kWh` : `${racks} راك × ${mods} بطارية ${BAT_MOD}kWh`;
-  const batLabel = prev && prevBat > 0 ? `${newBatLabel} + ${prev.batN} بطارية ${prev.batName} ${prev.batUnit}kWh (سابقة)` : newBatLabel;
+  const panelLabel = sys ? `${panels} لوح ${wattClean(sys.panelName, sys.panelW)}${prev && prevKwp > 0 ? ` + ${prev.panels} لوح ${wattClean(prev.panelName, prev.panelW)}` : ""}` : `${panels} لوح سنتك ${PANEL_W}W`;
+  const newBatLabel = sys ? (newBat > 0 ? `${mods} ${sys.batKind === "cab" ? (mods > 2 && mods < 11 ? "كبائن" : "كابينة") : "بطارية"} ${kwhClean(sys.batName, sys.batUnit)}` : "بدون بطاريات") : mods === 0 ? "بدون بطاريات" : peak <= 16 ? `${mods} بطارية Pylontech ${smallBat}kWh` : `${racks} راك × ${mods} بطارية ${BAT_MOD}kWh`;
+  const batLabel = prev && prevBat > 0 ? `${newBatLabel} + ${prev.batN} بطارية ${kwhClean(prev.batName, prev.batUnit)} (سابقة)` : newBatLabel;
   // منحنى الإنتاج الشمسي (جيبي من 6 إلى 18)
   const shape = Array.from({ length: 24 }, (_, h) => (h >= 6 && h < 18 ? Math.sin((Math.PI * (h + 0.5 - 6)) / 12) : 0));
   const sSum = shape.reduce((a, b) => a + b, 0);
@@ -93,6 +93,10 @@ function econ(total: number, genE: number, capex: number, price: number) {
   const saving = savedL * 365 * price;
   return { baseL, newL, savedL, saving, months: saving > 0 ? (capex / saving) * 12 : null, net5: saving * 5 - capex, sav5: saving * 5, co2: (savedL * 365 * CO2_PER_L) / 1000, cut: baseL > 0 ? (savedL / baseL) * 100 : 0 };
 }
+
+/** منع تكرار الواط/الكيلوواط في اسم المنتج إن كان مضمناً فيه مسبقاً */
+const wattClean = (name: string, w: number) => (new RegExp(`\\b${w}\\s*(w|wp|واط|وات)\\b`, "i").test(name) ? name : `${name} ${w}W`);
+const kwhClean = (name: string, k: number) => (new RegExp(`\\b${k}\\s*(kwh|كيلو)`, "i").test(name) ? name : `${name} ${k}kWh`);
 
 const R = { red: "#e60012", ink: "#14171c", sub: "#6b7280", line: "#e5e7eb", paper: "#f7f8fa", mint: "#e8f5ee", green: "#15803d" };
 const LOGO = "/brand/actes-logo-report.png";
@@ -181,6 +185,39 @@ export function EcoReport({ kw, price: price0, onBuy, onEdit, onSales, system, p
   const ys = (v: number) => P.t + (H - P.t - P.b) * (1 - v / 100);
   const noBat = d.batKwh <= 0;
   const fmtM = (m: number | null) => m === null ? "—" : `${nf(Math.round(m * 10) / 10, 1)} شهراً`;
+
+  // صفوف مفصّلة عند دمج منظومة سابقة: جديدة / سابقة / إجمالي
+  const prevKwp = prevSys ? (prevSys.panels * prevSys.panelW) / 1000 : 0;
+  const newKwp = d.kwp - prevKwp;
+  const prevInvKw = prevSys ? prevSys.invKw * prevSys.invN : 0;
+  const prevBatKwh = prevSys ? prevSys.batUnit * prevSys.batN : 0;
+  const newBatKwh = d.batKwh - prevBatKwh;
+  const invTotalKw = d.invN * d.unit + prevInvKw;
+  const cabWord = (n: number) => (n > 2 && n < 11 ? "كبائن" : "كابينة");
+  const newPanelTxt = system ? `${d.panels} لوح ${wattClean(system.panelName, system.panelW)} — ${nf(newKwp, 2)} kWp` : d.panelLabel;
+  const panelRows: string[][] = prevSys
+    ? [
+        ["الألواح الجديدة (المضافة)", "لا يوجد", newPanelTxt],
+        ["الألواح السابقة (القائمة)", "—", `${prevSys.panels} لوح ${wattClean(prevSys.panelName, prevSys.panelW)} — ${nf(prevKwp, 2)} kWp`],
+        ["إجمالي القدرة الشمسية بعد الدمج", "0 kWp", `${d.panels + prevSys.panels} لوح — ${nf(d.kwp, 2)} kWp`],
+      ]
+    : [["الألواح الشمسية", "لا يوجد", d.panelLabel], ["قدرة الألواح", "0 kWp", `${nf(d.kwp, 2)} kWp`]];
+  const invRows: string[][] = prevSys
+    ? [
+        ["الإنفرترات الجديدة", "لا يوجد", `${d.invN} وحدة ${d.invBrand} × ${d.unit} kW (${nf(d.invN * d.unit)} kW)`],
+        ...(prevSys.invN > 0 ? [[`الإنفرترات السابقة`, "—", `${prevSys.invN} وحدة ${prevSys.invName} × ${prevSys.invKw} kW (${nf(prevInvKw)} kW)`]] : []),
+        ["إجمالي قدرة الإنفرترات", "0 kW", `${nf(invTotalKw)} kW`],
+      ]
+    : [["الإنفرترات", "لا يوجد", `${d.invN} وحدة ${d.invBrand} × ${d.unit} kW`]];
+  const batRows: string[][] = noBat
+    ? []
+    : prevSys
+      ? [
+          ["سعة التخزين الجديدة", "لا يوجد", system ? `${system.batN} ${system.batKind === "cab" ? cabWord(system.batN) : "بطارية"} ${kwhClean(system.batName, system.batUnit)} (${nf(newBatKwh)} kWh)` : d.batLabel],
+          ...(prevBatKwh > 0 ? [["سعة التخزين السابقة", "—", `${prevSys.batN} بطارية ${kwhClean(prevSys.batName, prevSys.batUnit)} (${nf(prevBatKwh)} kWh)`]] : []),
+          ["إجمالي سعة التخزين بعد الدمج", "0 kWh", `${nf(d.batKwh)} kWh (${nf(d.batKwh * DOD)} kWh عند ${DOD * 100}% DoD)`],
+        ]
+      : [["بطاريات الليثيوم", "لا يوجد", `${d.batLabel} — ${nf(d.batKwh)} kWh (${nf(d.batKwh * DOD)} kWh عند ${DOD * 100}% DoD)`]];
 
   const [busy, setBusy] = useState(false);
   const download = async () => {
@@ -280,20 +317,20 @@ export function EcoReport({ kw, price: price0, onBuy, onEdit, onSales, system, p
             <table className="w-full min-w-[520px] text-xs">
               <thead><tr className="bg-navy text-primary-foreground"><th className="p-2 text-right">بند المقارنة</th><th className="p-2 text-right">بدون منظومة</th><th className="p-2 text-right">المنظومة المقترحة (Solar + BESS)</th></tr></thead>
               <tbody>
-                {[
-                  ["نوع المنظومة", "مولدات ديزل فقط", noBat ? "منظومة شمسية On-Grid بدون بطاريات" : "منظومة هجينة متكاملة Solar + BESS"],
-                  ["الألواح الشمسية", "لا يوجد", d.panelLabel],
-                  ["قدرة الألواح", "0 kWp", `${nf(d.kwp, 2)} kWp`],
-                  ["الإنفرترات", "لا يوجد", `${d.invN} وحدة ${d.invBrand} × ${d.unit} kW`],
-                  ...(noBat ? [] : [["بطاريات الليثيوم", "لا يوجد", `${d.batLabel} — ${nf(d.batKwh)} kWh (${nf(d.batKwh * DOD)} kWh عند ${DOD * 100}% DoD)`]]),
-                  ...(d.custom || noBat ? [] : [["راكات التخزين", "لا يوجد", `${d.racks} راك`]]),
+                {([
+                  ["نوع المنظومة", "مولدات ديزل فقط", noBat ? "منظومة شمسية On-Grid بدون بطاريات" : prevSys ? "منظومة هجينة متكاملة Solar + BESS (جديدة + قائمة مدمجة)" : "منظومة هجينة متكاملة Solar + BESS"],
+                  ...panelRows,
+                  ...invRows,
+                  ...batRows,
+                  ...(d.custom || noBat || prevSys ? [] : [["راكات التخزين", "لا يوجد", `${d.racks} راك`]]),
                   ["ساعات تشغيل المولد", `${d.baseHours} ساعة/يوم`, `${d.genHours} ساعة/يوم`],
                   ["استهلاك الديزل اليومي", `${nf(e.baseL)} لتر`, `${nf(e.newL)} لتر/يوم`],
                   ["استهلاك الديزل السنوي", `${nf(e.baseL * 365)} لتر`, `${nf(e.newL * 365)} لتر (توفير ${nf(e.savedL * 365)} لتر)`],
                   ["التكلفة التشغيلية السنوية", `$${nf(e.baseL * 365 * price0)}`, `$${nf(e.newL * 365 * price0)} (توفير $${nf(e.saving)})`],
+                  ...(prevSys && ePrev ? [["الوفر السنوي الإضافي من المنظومة الجديدة", "—", `$${nf(e.saving)} (بعد خصم وفر المنظومة السابقة $${nf(ePrev.saving)})`]] : []),
                   ["نسبة التغطية النظيفة", "0%", `${nf(d.clean)}% (${nf(d.solarPct)}% شمس + ${nf(d.clean - d.solarPct)}% بطاريات)`],
-                  ["الاستثمار المطلوب", "$0", `$${nf(d.capex)} — استرداد خلال ${fmtM(e.months)}`],
-                ].map(([a, b, c], i) => (
+                  ["الاستثمار المطلوب", "$0", `$${nf(d.capex)} — استرداد خلال ${fmtM(e.months)}${prevSys ? " (المنظومة الجديدة فقط)" : ""}`],
+                ] as string[][]).map(([a, b, c], i) => (
                   <tr key={a} className={i % 2 ? "bg-muted/40" : ""}><td className="p-2 font-bold">{a}</td><td className="p-2 text-muted-foreground">{b}</td><td className="p-2 font-bold text-navy">{c}</td></tr>
                 ))}
               </tbody>
@@ -316,14 +353,20 @@ export function EcoReport({ kw, price: price0, onBuy, onEdit, onSales, system, p
         <Sec n="03" kicker="المواصفات الفنية" title="مواصفات المعدات المقترحة" note="المواصفات العامة لفئة المعدات المعتمدة؛ تُثبَّت الموديلات النهائية في عرض السعر.">
           <table className="w-full text-xs">
             <thead><tr className="bg-navy text-primary-foreground"><th className="p-2 text-right">المكوّن</th><th className="p-2 text-right">الكمية / القدرة</th><th className="p-2 text-right">المواصفة الفنية</th></tr></thead>
-            <tbody>{[
-              ["الألواح الشمسية", `${d.panelLabel} — ${nf(d.kwp, 2)} kWp`, d.panels > 0 && d.kwp * 1000 / d.panels >= 700 ? "Suntech STP720S-D66/Nsh+ — N-Type TOPCon ثنائي الوجه زجاج/زجاج، كفاءة 23.2%، معامل حرارة -0.29%/°C، 2384×1303×33 مم، 37.3 كغ، ضمان 15 سنة منتج و30 سنة أداء (تدهور 0.40%/سنة)" : d.panels > 0 && Math.abs(d.kwp * 1000 / d.panels - 590) <= 10 ? "Suntech STP595S-C72/Nsh+ — N-Type TOPCon ثنائي الوجه، كفاءة حتى 23.2%، 2278×1134×30 مم، 32 كغ، ضمان 15 سنة منتج و30 سنة أداء" : "خلايا أحادية البلورة عالية الكفاءة، مقاومة للحرارة والغبار، ضمان أداء طويل الأمد"],
-              ["الإنفرترات الهجينة", `${d.invN} × ${d.invBrand} ${d.unit} kW`, "تحويل نقي (Pure Sine)، متتبع MPPT متعدد، حماية من الغبار والرطوبة، مراقبة عن بعد"],
-              ...(noBat ? [] : [["بطاريات الليثيوم", `${d.batLabel} — ${nf(d.batKwh)} kWh`, `كيمياء LiFePO4 آمنة، عمق تفريغ ${DOD * 100}%، نظام إدارة بطاريات BMS ذكي`]]),
+            <tbody>{([
+              [prevSys ? "الألواح الشمسية الجديدة" : "الألواح الشمسية", prevSys ? newPanelTxt : `${d.panelLabel} — ${nf(d.kwp, 2)} kWp`, d.panels > 0 && d.kwp * 1000 / d.panels >= 700 ? "Suntech STP720S-D66/Nsh+ — N-Type TOPCon ثنائي الوجه زجاج/زجاج، كفاءة 23.2%، معامل حرارة -0.29%/°C، 2384×1303×33 مم، 37.3 كغ، ضمان 15 سنة منتج و30 سنة أداء (تدهور 0.40%/سنة)" : d.panels > 0 && Math.abs(d.kwp * 1000 / d.panels - 590) <= 10 ? "Suntech STP595S-C72/Nsh+ — N-Type TOPCon ثنائي الوجه، كفاءة حتى 23.2%، 2278×1134×30 مم، 32 كغ، ضمان 15 سنة منتج و30 سنة أداء" : "خلايا أحادية البلورة عالية الكفاءة، مقاومة للحرارة والغبار، ضمان أداء طويل الأمد"],
+              [prevSys ? "الإنفرترات الهجينة الجديدة" : "الإنفرترات الهجينة", `${d.invN} × ${d.invBrand} ${d.unit} kW`, "تحويل نقي (Pure Sine)، متتبع MPPT متعدد، حماية من الغبار والرطوبة، مراقبة عن بعد"],
+              ...(noBat ? [] : [[prevSys ? "سعة التخزين الجديدة" : "بطاريات الليثيوم", prevSys && system ? `${system.batN} ${system.batKind === "cab" ? cabWord(system.batN) : "بطارية"} ${kwhClean(system.batName, system.batUnit)} — ${nf(newBatKwh)} kWh` : `${d.batLabel} — ${nf(d.batKwh)} kWh`, `كيمياء LiFePO4 آمنة، عمق تفريغ ${DOD * 100}%، نظام إدارة بطاريات BMS ذكي`]]),
+              ...(prevSys ? [
+                ["الألواح السابقة (قائمة)", `${prevSys.panels} لوح ${wattClean(prevSys.panelName, prevSys.panelW)} — ${nf(prevKwp, 2)} kWp`, "منظومة قائمة مدمجة — تدخل في الإنتاج والتغطية فقط ولا تدخل في الاستثمار"],
+                ...(prevSys.invN > 0 ? [["الإنفرترات السابقة (قائمة)", `${prevSys.invN} × ${prevSys.invName} ${prevSys.invKw} kW`, "منظومة قائمة مدمجة"]] : []),
+                ...(prevBatKwh > 0 ? [["التخزين السابق (قائم)", `${prevSys.batN} × ${kwhClean(prevSys.batName, prevSys.batUnit)}`, "منظومة قائمة مدمجة"]] : []),
+                ["الإجمالي بعد الدمج", `${nf(d.kwp, 2)} kWp • ${nf(invTotalKw)} kW إنفرترات${noBat ? "" : ` • ${nf(d.batKwh)} kWh تخزين`}`, "إجمالي قدرات المنظومتين معاً"],
+              ] : []),
               ["كابلات DC/AC", "حسب التصميم الهندسي", "كابلات شمسية مقاومة للأشعة فوق البنفسجية، مقاطع محسوبة لفاقد جهد أقل من 2%"],
               ["الحمايات", "لوحات DC و AC", "قواطع وفيوزات DC، مانعات صواعق SPD، تأريض كامل للمنظومة"],
               ["الهياكل", "هياكل تثبيت", "حديد مجلفن أو ألمنيوم مقاوم للصدأ وبزاوية ميل مثالية"],
-            ].map(([a, b, c], i) => <tr key={a} className={i % 2 ? "bg-muted/40" : ""}><td className="p-2 font-bold">{a}</td><td className="p-2 text-navy">{b}</td><td className="p-2 text-muted-foreground">{c}</td></tr>)}</tbody>
+            ] as string[][]).map(([a, b, c], i) => <tr key={a} className={i % 2 ? "bg-muted/40" : ""}><td className="p-2 font-bold">{a}</td><td className="p-2 text-navy">{b}</td><td className="p-2 text-muted-foreground">{c}</td></tr>)}</tbody>
           </table>
           {(() => {
             const w = d.panels > 0 ? (d.kwp * 1000) / d.panels : 0;
