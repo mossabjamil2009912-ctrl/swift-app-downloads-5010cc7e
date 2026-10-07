@@ -332,7 +332,7 @@ export function EcoSystemStudy({ onSales }: { onSales?: () => void }) {
   const fixedInv = cab && f.batKwh === "260";
   const QUICK: Partial<Record<keyof typeof f, string[]>> = {
     panel: ["Suntech 720W", "Suntech 595W"], panelW: ["720", "595"],
-    inv: ["Deye", "Solis"], invKw: cab && (f.batKwh === "313" || f.batKwh === "112") ? ["50", "80", "125"] : ["12", "50", "125"],
+    inv: ["Deye", "Solis", "Huawei"], invKw: cab && (f.batKwh === "313" || f.batKwh === "112") ? ["50", "80", "125"] : ["12", "50", "125"],
     bat: ["Pylontech", "HiTHIUM"], batKwh: cab ? cabKwh : ["5.12", "16"],
   };
   const pickQuick = (k: keyof typeof f, q: string) => {
