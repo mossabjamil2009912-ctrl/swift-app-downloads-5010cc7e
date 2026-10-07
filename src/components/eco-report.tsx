@@ -353,14 +353,20 @@ export function EcoReport({ kw, price: price0, onBuy, onEdit, onSales, system, p
         <Sec n="03" kicker="المواصفات الفنية" title="مواصفات المعدات المقترحة" note="المواصفات العامة لفئة المعدات المعتمدة؛ تُثبَّت الموديلات النهائية في عرض السعر.">
           <table className="w-full text-xs">
             <thead><tr className="bg-navy text-primary-foreground"><th className="p-2 text-right">المكوّن</th><th className="p-2 text-right">الكمية / القدرة</th><th className="p-2 text-right">المواصفة الفنية</th></tr></thead>
-            <tbody>{[
-              ["الألواح الشمسية", `${d.panelLabel} — ${nf(d.kwp, 2)} kWp`, d.panels > 0 && d.kwp * 1000 / d.panels >= 700 ? "Suntech STP720S-D66/Nsh+ — N-Type TOPCon ثنائي الوجه زجاج/زجاج، كفاءة 23.2%، معامل حرارة -0.29%/°C، 2384×1303×33 مم، 37.3 كغ، ضمان 15 سنة منتج و30 سنة أداء (تدهور 0.40%/سنة)" : d.panels > 0 && Math.abs(d.kwp * 1000 / d.panels - 590) <= 10 ? "Suntech STP595S-C72/Nsh+ — N-Type TOPCon ثنائي الوجه، كفاءة حتى 23.2%، 2278×1134×30 مم، 32 كغ، ضمان 15 سنة منتج و30 سنة أداء" : "خلايا أحادية البلورة عالية الكفاءة، مقاومة للحرارة والغبار، ضمان أداء طويل الأمد"],
-              ["الإنفرترات الهجينة", `${d.invN} × ${d.invBrand} ${d.unit} kW`, "تحويل نقي (Pure Sine)، متتبع MPPT متعدد، حماية من الغبار والرطوبة، مراقبة عن بعد"],
-              ...(noBat ? [] : [["بطاريات الليثيوم", `${d.batLabel} — ${nf(d.batKwh)} kWh`, `كيمياء LiFePO4 آمنة، عمق تفريغ ${DOD * 100}%، نظام إدارة بطاريات BMS ذكي`]]),
+            <tbody>{([
+              [prevSys ? "الألواح الشمسية الجديدة" : "الألواح الشمسية", prevSys ? newPanelTxt : `${d.panelLabel} — ${nf(d.kwp, 2)} kWp`, d.panels > 0 && d.kwp * 1000 / d.panels >= 700 ? "Suntech STP720S-D66/Nsh+ — N-Type TOPCon ثنائي الوجه زجاج/زجاج، كفاءة 23.2%، معامل حرارة -0.29%/°C، 2384×1303×33 مم، 37.3 كغ، ضمان 15 سنة منتج و30 سنة أداء (تدهور 0.40%/سنة)" : d.panels > 0 && Math.abs(d.kwp * 1000 / d.panels - 590) <= 10 ? "Suntech STP595S-C72/Nsh+ — N-Type TOPCon ثنائي الوجه، كفاءة حتى 23.2%، 2278×1134×30 مم، 32 كغ، ضمان 15 سنة منتج و30 سنة أداء" : "خلايا أحادية البلورة عالية الكفاءة، مقاومة للحرارة والغبار، ضمان أداء طويل الأمد"],
+              [prevSys ? "الإنفرترات الهجينة الجديدة" : "الإنفرترات الهجينة", `${d.invN} × ${d.invBrand} ${d.unit} kW`, "تحويل نقي (Pure Sine)، متتبع MPPT متعدد، حماية من الغبار والرطوبة، مراقبة عن بعد"],
+              ...(noBat ? [] : [[prevSys ? "سعة التخزين الجديدة" : "بطاريات الليثيوم", prevSys && system ? `${system.batN} ${system.batKind === "cab" ? cabWord(system.batN) : "بطارية"} ${kwhClean(system.batName, system.batUnit)} — ${nf(newBatKwh)} kWh` : `${d.batLabel} — ${nf(d.batKwh)} kWh`, `كيمياء LiFePO4 آمنة، عمق تفريغ ${DOD * 100}%، نظام إدارة بطاريات BMS ذكي`]]),
+              ...(prevSys ? [
+                ["الألواح السابقة (قائمة)", `${prevSys.panels} لوح ${wattClean(prevSys.panelName, prevSys.panelW)} — ${nf(prevKwp, 2)} kWp`, "منظومة قائمة مدمجة — تدخل في الإنتاج والتغطية فقط ولا تدخل في الاستثمار"],
+                ...(prevSys.invN > 0 ? [["الإنفرترات السابقة (قائمة)", `${prevSys.invN} × ${prevSys.invName} ${prevSys.invKw} kW`, "منظومة قائمة مدمجة"]] : []),
+                ...(prevBatKwh > 0 ? [["التخزين السابق (قائم)", `${prevSys.batN} × ${kwhClean(prevSys.batName, prevSys.batUnit)}`, "منظومة قائمة مدمجة"]] : []),
+                ["الإجمالي بعد الدمج", `${nf(d.kwp, 2)} kWp • ${nf(invTotalKw)} kW إنفرترات${noBat ? "" : ` • ${nf(d.batKwh)} kWh تخزين`}`, "إجمالي قدرات المنظومتين معاً"],
+              ] : []),
               ["كابلات DC/AC", "حسب التصميم الهندسي", "كابلات شمسية مقاومة للأشعة فوق البنفسجية، مقاطع محسوبة لفاقد جهد أقل من 2%"],
               ["الحمايات", "لوحات DC و AC", "قواطع وفيوزات DC، مانعات صواعق SPD، تأريض كامل للمنظومة"],
               ["الهياكل", "هياكل تثبيت", "حديد مجلفن أو ألمنيوم مقاوم للصدأ وبزاوية ميل مثالية"],
-            ].map(([a, b, c], i) => <tr key={a} className={i % 2 ? "bg-muted/40" : ""}><td className="p-2 font-bold">{a}</td><td className="p-2 text-navy">{b}</td><td className="p-2 text-muted-foreground">{c}</td></tr>)}</tbody>
+            ] as string[][]).map(([a, b, c], i) => <tr key={a} className={i % 2 ? "bg-muted/40" : ""}><td className="p-2 font-bold">{a}</td><td className="p-2 text-navy">{b}</td><td className="p-2 text-muted-foreground">{c}</td></tr>)}</tbody>
           </table>
           {(() => {
             const w = d.panels > 0 ? (d.kwp * 1000) / d.panels : 0;
