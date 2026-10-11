@@ -1,5 +1,5 @@
 // يولّد التعليقات الصوتية لمقدمات فيديوهات المنتجات في public/audio لتنطلق فوراً وبلا إنترنت.
-import { PRODUCTS } from "@/lib/products-data";
+import { CATALOG_PRODUCTS } from "@/lib/products-data";
 import { getProductVideo, videoIntroNarration } from "@/lib/product-video";
 import { voiceTextFor } from "@/lib/voice-guide";
 import { applyWaqf, diacritizeNumberWords } from "@/lib/ar-lexicon";
