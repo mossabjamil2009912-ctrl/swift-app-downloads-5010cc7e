@@ -1,5 +1,6 @@
 // تحميل مسبق فوري للصور الخفيفة المستخدمة في الشاشات الأولى،
 // حتى تظهر بطاقات نوع المشروع وبطاقات الخدمات بصورها بلا أي انتظار.
+import { warmVideos } from "@/lib/video-source";
 import residentialImage from "@/assets/actes-residential.webp";
 import commercialImage from "@/assets/actes-commercial.webp";
 import industrialImage from "@/assets/actes-industrial.webp";
@@ -78,9 +79,38 @@ const PUBLIC_IMAGES = [
   "/media/items/actes-61-5kwh-powercube.webp",
 ];
 
+// فيديوهات المعرض: تُجهَّز في ذاكرة المتصفح الدائمة وقت الفراغ،
+// فتنطلق فوراً عند فتح أي منتج (تبقى بجودتها الأصلية 1080p بلا أي ضغط).
+const SHOWROOM_VIDEOS = [
+  "/videos/deye-sun-3-6k-sg04lp1.mp4",
+  "/videos/deye-sun-7-6-12k-sg02lp1.mp4",
+  "/videos/deye-sun-14-20k-sg05lp3.mp4",
+  "/videos/deye-sun-29-9-50k-sg01hp3.mp4",
+  "/videos/deye-sun-60-80k-sg02hp3.mp4",
+  "/videos/solis-s6-eh2p-5-8k.mp4",
+  "/videos/solis-s6-eh3p-12-20k-h.mp4",
+  "/videos/solis-s6-eh3p-29-9-50k-h.mp4",
+  "/videos/solis-s6-eh3p-75-125k.mp4",
+  "/videos/lipower-2012emh.mp4",
+  "/videos/lipower-bz4024smhgw.mp4",
+  "/videos/lipower-bz6248smh.mp4",
+  "/videos/pylontech-uf5000.mp4",
+  "/videos/pylontech-rv12100ch.mp4",
+  "/videos/pylontech-rv12200.mp4",
+  "/videos/pylontech-rv12314.mp4",
+  "/videos/pylontech-fidus-battery-plus.mp4",
+  "/videos/pylontech-optimus-a300-hy.mp4",
+  "/videos/pylontech-optimus-l260-hy.mp4",
+  "/videos/pylontech-powercube-m1c.mp4",
+  "/videos/pylontech-powercube-m5a.mp4",
+  "/videos/hithium-heroee-maxpower-16.mp4",
+  "/videos/suntech-stp595s-c72-nsh.mp4",
+  "/videos/suntech-stp720s-d66-nsh.mp4",
+];
+
 let done = false;
 
-/** يحمّل الصور في ذاكرة المتصفح مرة واحدة فور بدء التطبيق. */
+/** يحمّل الصور في ذاكرة المتصفح مرة واحدة فور بدء التطبيق، ويجهّز فيديوهات المعرض في الخلفية. */
 export function preloadAppImages() {
   if (done || typeof window === "undefined") return;
   done = true;
@@ -90,4 +120,8 @@ export function preloadAppImages() {
     img.src = src;
     void img.decode?.().catch(() => {});
   }
+  // تجهيز الفيديوهات بعد اكتمال تحميل الصفحة حتى لا تنافس الصور على الإنترنت.
+  const start = () => warmVideos(SHOWROOM_VIDEOS);
+  if (document.readyState === "complete") start();
+  else window.addEventListener("load", start, { once: true });
 }
