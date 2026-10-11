@@ -28,6 +28,35 @@ const SPLIT_VIDEOS: Record<string, string[]> = {
 };
 
 const cache = new Map<string, string>();
+const STORE_NAME = "actes-videos-v1";
+
+async function openStore() {
+  return typeof caches !== "undefined" ? await caches.open(STORE_NAME).catch(() => null) : null;
+}
+
+/** يخزّن فيديو في ذاكرة المتصفح الدائمة إن لم يكن مخزّناً (يُستخدم للتجهيز الخلفي). */
+async function warmOne(store: Cache | null, url: string) {
+  if (!store) return;
+  const hit = await store.match(url).catch(() => undefined);
+  if (hit) return;
+  const res = await fetch(url).catch(() => null);
+  if (res?.ok) await store.put(url, res).catch(() => {});
+}
+
+/** يجهّز قائمة فيديوهات في الخلفية وقت فراغ المتصفح، فتنطلق فوراً عند فتحها لاحقاً. */
+export function warmVideos(urls: string[]) {
+  if (typeof window === "undefined") return;
+  const run = async () => {
+    const store = await openStore();
+    for (const url of urls) {
+      const parts = SPLIT_VIDEOS[url] ?? [url];
+      for (const p of parts) await warmOne(store, p);
+    }
+  };
+  const idle = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => void }).requestIdleCallback;
+  if (idle) idle(() => void run(), { timeout: 8000 });
+  else window.setTimeout(() => void run(), 4000);
+}
 
 /** يُرجع مسار التشغيل النهائي: المسار المباشر، أو رابط مؤقت لفيديو أُعيد تجميعه من أجزائه. */
 export function useResolvedVideoSrc(src: string): string {
@@ -36,8 +65,25 @@ export function useResolvedVideoSrc(src: string): string {
 
   useEffect(() => {
     if (!parts) {
+      // فيديو مباشر: إن كان مجهّزاً مسبقاً في الذاكرة الدائمة نشغّله منها فوراً.
+      const cached = cache.get(src);
+      if (cached) {
+        setResolved(cached);
+        return;
+      }
       setResolved(src);
-      return;
+      let cancelled = false;
+      void (async () => {
+        const store = await openStore();
+        const hit = store ? await store.match(src).catch(() => undefined) : undefined;
+        if (!hit || cancelled) return;
+        const url = URL.createObjectURL(await hit.blob());
+        cache.set(src, url);
+        setResolved(url);
+      })();
+      return () => {
+        cancelled = true;
+      };
     }
     const cached = cache.get(src);
     if (cached) {
