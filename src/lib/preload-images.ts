@@ -1,5 +1,6 @@
 // تحميل مسبق فوري للصور الخفيفة المستخدمة في الشاشات الأولى،
 // حتى تظهر بطاقات نوع المشروع وبطاقات الخدمات بصورها بلا أي انتظار.
+import { warmVideos } from "@/lib/video-source";
 import residentialImage from "@/assets/actes-residential.webp";
 import commercialImage from "@/assets/actes-commercial.webp";
 import industrialImage from "@/assets/actes-industrial.webp";
