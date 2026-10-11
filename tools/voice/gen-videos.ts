@@ -10,7 +10,7 @@ const INSTR = "اقرأ النص العربي التالي بالفصحى بأس
 const out = "public/audio";
 
 const jobs = new Map<string, string>();
-for (const p of PRODUCTS) {
+for (const p of CATALOG_PRODUCTS) {
   const video = getProductVideo(p.baseId ?? p.id);
   if (!video) continue;
   const narration = videoIntroNarration(p, video);
