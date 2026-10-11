@@ -9,7 +9,7 @@ import { PylontechSolution } from "@/components/pylontech-solution";
 import { PylontechNav } from "@/components/pylontech-nav";
 import { useResolvedVideoSrc } from "@/lib/video-source";
 import actesLogo from "@/assets/actes-logo-full.webp";
-import resBess from "@/assets/pylon/residential-bess.jpg";
+import resBess from "@/assets/pylon/residential-bess.webp";
 
 export const Route = createFileRoute("/pylontech")({
   head: () => ({

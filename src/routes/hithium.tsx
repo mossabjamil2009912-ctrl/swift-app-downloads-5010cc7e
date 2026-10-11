@@ -73,7 +73,7 @@ function HithiumPage() {
       </header>
 
       <section className="relative overflow-hidden bg-muted">
-        {video && <video src={video} poster="/media/hithium-legend-112s.jpg" autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover opacity-40" />}
+        {video && <video src={video} poster="/media/hithium-legend-112s.webp" autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover opacity-40" />}
         <div className="relative mx-auto max-w-6xl px-4 py-16 text-center sm:py-24">
           <img src="/brand/makers/hithium.png" alt="HiTHIUM" className="mx-auto h-14 w-auto sm:h-20" />
           <h1 className="mt-6 text-3xl font-bold sm:text-5xl">تخزين طاقة آمن وطويل العمر</h1>
@@ -120,7 +120,7 @@ function HithiumPage() {
 
       <AgencyShowcase brand="hithium" />
       <footer className="border-t border-border bg-card py-8 text-center text-sm text-muted-foreground">HiTHIUM — متوفر لدى ACTES لحلول أنظمة الطاقة</footer>
-      {sel && <BrandProductDetail product={sel} accent="#00a0e9" gallery={["/media/hithium-legend-112s.jpg","/media/hithium-legend-112c.jpg","/media/items/battery-hithium-legnd-16kwh.jpg","/media/items/battery-hithium-12v-314ah.jpg"]} onClose={() => setSel(null)} />}
+      {sel && <BrandProductDetail product={sel} accent="#00a0e9" gallery={["/media/hithium-legend-112s.webp","/media/hithium-legend-112c.webp","/media/items/battery-hithium-legnd-16kwh.jpg","/media/items/battery-hithium-12v-314ah.jpg"]} onClose={() => setSel(null)} />}
     </main>
   );
 }
