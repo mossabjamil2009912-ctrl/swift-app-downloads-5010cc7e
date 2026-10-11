@@ -11,11 +11,33 @@ import cardProducts from "@/assets/card-products.webp";
 import actesLogo from "@/assets/actes-logo-full.webp";
 import homeHero from "@/assets/actes-home-hero.webp";
 import partnersStrip from "@/assets/partners-strip.webp";
+import startBgDesktop from "@/assets/start-bg-desktop.webp";
+import startBgMobile from "@/assets/start-bg-mobile.webp";
+import p2 from "@/assets/products/p2.webp";
+import p3 from "@/assets/products/p3.webp";
+import p4 from "@/assets/products/p4.webp";
+import p8 from "@/assets/products/p8.webp";
+import p9 from "@/assets/products/p9.webp";
+import p10 from "@/assets/products/p10.webp";
+import p11 from "@/assets/products/p11.webp";
+import p12 from "@/assets/products/p12.webp";
+import p13 from "@/assets/products/p13.webp";
+import p14 from "@/assets/products/p14.webp";
+import p15 from "@/assets/products/p15.webp";
+import p16 from "@/assets/products/p16.webp";
+import p17 from "@/assets/products/p17.webp";
+import p18 from "@/assets/products/p18.webp";
+import p19 from "@/assets/products/p19.webp";
+import p20 from "@/assets/products/p20.webp";
+import p21 from "@/assets/products/p21.webp";
 
-// الترتيب بالأولوية: صورة الغلاف وشريط الوكلاء أولاً، ثم صور شاشة نوع المشروع وبطاقات الشاشة الرئيسية.
+// الترتيب بالأولوية: صورة الغلاف وشريط الوكلاء أولاً، ثم صور شاشة نوع المشروع وبطاقات الشاشة الرئيسية،
+// ثم صور المنتجات (خفيفة WebP) حتى تظهر شاشات المنتجات وطلب صنف محدد فوراً.
 const IMAGES = [
   homeHero,
   partnersStrip,
+  startBgDesktop,
+  startBgMobile,
   residentialImage,
   commercialImage,
   industrialImage,
@@ -25,6 +47,35 @@ const IMAGES = [
   cardSupport,
   cardProducts,
   actesLogo,
+  p2, p3, p4, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21,
+];
+
+// صور شاشات الأصناف والبوت (من public/media — كلها WebP خفيفة الآن)
+const PUBLIC_IMAGES = [
+  "/media/items/suntech-595w.webp",
+  "/media/items/suntech-720w.webp",
+  "/media/items/lipower-1.6kw-12v.webp",
+  "/media/items/lipower-6.2kw-48v.webp",
+  "/media/items/deye-8kw-1ph.webp",
+  "/media/items/deye-12kw-1ph.webp",
+  "/media/items/deye-16kw-1ph.webp",
+  "/media/items/deye-12kw-3ph.webp",
+  "/media/items/deye-16kw-3ph.webp",
+  "/media/items/deye-20kw-3ph.webp",
+  "/media/items/deye-50kw-3ph.webp",
+  "/media/items/deye-80kw-3ph.webp",
+  "/media/items/solis-50kw-3ph.webp",
+  "/media/items/solis-125kw-3ph.webp",
+  "/media/items/battery-pylontech-12v-100ah.webp",
+  "/media/items/battery-pylontech-12v-200ah.webp",
+  "/media/items/battery-hithium-12v-314ah.webp",
+  "/media/items/battery-pylontech-uf5000-5.12kwh.webp",
+  "/media/items/battery-pylontech-fidus-16kwh.webp",
+  "/media/items/battery-hithium-legnd-16kwh.webp",
+  "/media/items/actes-112kwh-heroee.webp",
+  "/media/items/actes-313kwh-pylontech.webp",
+  "/media/items/actes-104kwh-powercube-m1.webp",
+  "/media/items/actes-61-5kwh-powercube.webp",
 ];
 
 let done = false;
