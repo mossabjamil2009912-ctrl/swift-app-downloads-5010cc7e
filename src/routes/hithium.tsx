@@ -120,7 +120,7 @@ function HithiumPage() {
 
       <AgencyShowcase brand="hithium" />
       <footer className="border-t border-border bg-card py-8 text-center text-sm text-muted-foreground">HiTHIUM — متوفر لدى ACTES لحلول أنظمة الطاقة</footer>
-      {sel && <BrandProductDetail product={sel} accent="#00a0e9" gallery={["/media/hithium-legend-112s.webp","/media/hithium-legend-112c.webp","/media/items/battery-hithium-legnd-16kwh.jpg","/media/items/battery-hithium-12v-314ah.jpg"]} onClose={() => setSel(null)} />}
+      {sel && <BrandProductDetail product={sel} accent="#00a0e9" gallery={["/media/hithium-legend-112s.webp","/media/hithium-legend-112c.webp","/media/items/battery-hithium-legnd-16kwh.webp","/media/items/battery-hithium-12v-314ah.webp"]} onClose={() => setSel(null)} />}
     </main>
   );
 }

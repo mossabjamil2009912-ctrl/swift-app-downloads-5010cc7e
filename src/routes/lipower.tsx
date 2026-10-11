@@ -80,7 +80,7 @@ function LiPowerPage() {
       <footer className="border-t border-border bg-card py-8 text-center text-sm text-muted-foreground">
         Li-Power — متوفر لدى ACTES لحلول أنظمة الطاقة
       </footer>
-      {sel && <BrandProductDetail product={sel} accent="#f39200" gallery={["/media/items/lipower-1.6kw-12v.jpg","/media/items/lipower-6.2kw-48v.jpg"]} onClose={() => setSel(null)} />}
+      {sel && <BrandProductDetail product={sel} accent="#f39200" gallery={["/media/items/lipower-1.6kw-12v.webp","/media/items/lipower-6.2kw-48v.webp"]} onClose={() => setSel(null)} />}
     </main>
   );
 }

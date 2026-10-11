@@ -13,7 +13,7 @@ export type PylonSolution = {
 
 export const PYLON_SOLUTIONS: PylonSolution[] = [
   {
-    id: "res", t: "أنظمة التخزين السكنية", en: "Residential ESS", img: "/media/pylontech/sol-ress.jpg",
+    id: "res", t: "أنظمة التخزين السكنية", en: "Residential ESS", img: "/media/pylontech/sol-ress.webp",
     pylon: "حلول تخزين منزلية من بايلونتك تخزّن فائض الطاقة الشمسية نهاراً وتغذي المنزل ليلاً وعند انقطاع الكهرباء، بخلايا ليثيوم فوسفات الحديد الآمنة وعمر يتجاوز 6000 دورة.",
     scenario: ["تخزين فائض الألواح نهاراً", "تغذية المنزل ليلاً وعند الانقطاع", "توسّع تدريجي حسب الحاجة"],
     products: ["pylontech-uf5000", "pylontech-fidus-battery-plus"],
@@ -21,7 +21,7 @@ export const PYLON_SOLUTIONS: PylonSolution[] = [
     pairs: ["إنفرترات Deye هجينة 3.6–12 كيلو 1 فاز", "إنفرترات Solis S6-EH1P/EH3P", "ألواح Suntech ‏595W و720W"],
   },
   {
-    id: "ci", t: "التخزين التجاري والصناعي", en: "C&I Hybrid ESS", img: "/media/pylontech/sol-ci.jpg",
+    id: "ci", t: "التخزين التجاري والصناعي", en: "C&I Hybrid ESS", img: "/media/pylontech/sol-ci.webp",
     pylon: "كبائن تخزين متكاملة الكل-في-واحد من بايلونتك تضم البطاريات والإنفرتر الهجين ونظام التبريد السائل والحماية من الحريق في وحدة خارجية واحدة.",
     scenario: ["خفض استهلاك المولدات وفاتورة الديزل", "تخفيف ذروة الأحمال", "تشغيل المصانع والمنشآت على مدار الساعة"],
     products: ["pylontech-optimus-a300-hy", "pylontech-optimus-l260-hy"],
@@ -29,7 +29,7 @@ export const PYLON_SOLUTIONS: PylonSolution[] = [
     pairs: ["إنفرترات Solis ‏75–125 كيلو 3 فاز", "إنفرترات Deye ‏29.9–80 كيلو 3 فاز", "ألواح Suntech ‏720W ثنائية الوجه"],
   },
   {
-    id: "hv", t: "الجهد العالي والمشاريع الكبرى", en: "High-Voltage Utility BESS", img: "/media/pylontech/sol-rbess.jpg",
+    id: "hv", t: "الجهد العالي والمشاريع الكبرى", en: "High-Voltage Utility BESS", img: "/media/pylontech/sol-rbess.webp",
     pylon: "بنوك تخزين معيارية عالية الجهد من بايلونتك للمشاريع الكبيرة ومحطات الطاقة، تتوسع بالراكات حتى 1500 فولت.",
     scenario: ["محطات الطاقة الشمسية الكبيرة", "خدمات الشبكة وموازنة الأحمال", "مشاريع المرافق والبنية التحتية"],
     products: ["pylontech-powercube-m5a", "pylontech-powercube-m1c"],
@@ -37,7 +37,7 @@ export const PYLON_SOLUTIONS: PylonSolution[] = [
     pairs: ["إنفرترات Solis وDeye عالية الجهد 3 فاز", "ألواح Suntech ‏720W", "تخزين HiTHIUM للمشاريع الكبيرة"],
   },
   {
-    id: "off", t: "الأنظمة المستقلة والمتنقلة", en: "Off-Grid & Mobile ESS", img: "/media/pylontech/sol-ress.jpg",
+    id: "off", t: "الأنظمة المستقلة والمتنقلة", en: "Off-Grid & Mobile ESS", img: "/media/pylontech/sol-ress.webp",
     pylon: "بطاريات ليثيوم 12 فولت الذكية من بايلونتك بديل مباشر لبطاريات الرصاص، أخف بنسبة 50% مع مراقبة عبر Bluetooth، للمركبات والقوارب والكبائن والمواقع البعيدة.",
     scenario: ["المواقع البعيدة خارج الشبكة", "المركبات والقوارب والكرفانات", "استبدال بطاريات الرصاص"],
     products: ["pylontech-rv12100ch", "pylontech-rv12200"],
