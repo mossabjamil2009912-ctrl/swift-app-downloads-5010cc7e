@@ -84,7 +84,7 @@ let done = false;
 export function preloadAppImages() {
   if (done || typeof window === "undefined") return;
   done = true;
-  for (const src of IMAGES) {
+  for (const src of [...IMAGES, ...PUBLIC_IMAGES]) {
     const img = new Image();
     img.decoding = "async";
     img.src = src;
