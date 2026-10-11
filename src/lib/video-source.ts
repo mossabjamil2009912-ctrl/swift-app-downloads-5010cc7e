@@ -94,7 +94,7 @@ export function useResolvedVideoSrc(src: string): string {
     void (async () => {
       try {
         // التخزين الدائم في المتصفح: بعد أول تحميل يبدأ الفيديو فوراً دون إعادة تنزيل.
-        const store = typeof caches !== "undefined" ? await caches.open("actes-videos-v1").catch(() => null) : null;
+        const store = await openStore();
         const buffers = await Promise.all(
           parts.map(async (p) => {
             const hit = store ? await store.match(p) : undefined;
