@@ -195,6 +195,7 @@ async function loadAudio(text: string, lang: Lang, background = false) {
 
   // الأصوات الجاهزة المحفوظة داخل التطبيق تعمل بدون إنترنت.
   const local = await staticAudio(text, lang);
+  console.log("[voice] loadAudio", background ? "bg" : "fg", local ? "STATIC" : "NETWORK", `${lang}-${textHash(text)}`, JSON.stringify(text));
   if (local) return local;
 
   // صوت الشاشة المعروضة يأخذ أولوية عالية في طابور الشبكة،
