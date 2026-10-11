@@ -9,7 +9,7 @@ import { PylontechSolution } from "@/components/pylontech-solution";
 import { PylontechNav } from "@/components/pylontech-nav";
 import { useResolvedVideoSrc } from "@/lib/video-source";
 import actesLogo from "@/assets/actes-logo-full.webp";
-import resBess from "@/assets/pylon/residential-bess.jpg";
+import resBess from "@/assets/pylon/residential-bess.webp";
 
 export const Route = createFileRoute("/pylontech")({
   head: () => ({
@@ -27,9 +27,9 @@ export const Route = createFileRoute("/pylontech")({
 
 
 const SLIDES = [
-  { id: "home", video: "/videos/pylontech-home-official.mp4", poster: "/media/pylontech/hero-h3x.jpg", k: "PYLONTECH", t: "حرّر طاقتك بشكل مستدام", d: "المورّد الرائد عالمياً لأنظمة تخزين الطاقة بالبطاريات" },
-  { id: "pylontech-fidus-battery-plus", video: "/videos/pylontech-fidus-official.mp4", poster: "/media/pylontech/hero-fidus.jpg", k: "Fidus", t: "عبر الحدود، طاقة بلا حدود", d: "من 5 حتى 16 كيلوواط ساعة، توسّع حسب حاجتك" },
-  { id: "pylontech-optimus-l260-hy", video: "", poster: "/media/pylontech/hero-h3x.jpg", k: "All-in-One", t: "طاقة أذكى، توفير أكبر", d: "منظومة تخزين متكاملة الكل في واحد تُحدث ثورة في تجربة التخزين" },
+  { id: "home", video: "/videos/pylontech-home-official.mp4", poster: "/media/pylontech/hero-h3x.webp", k: "PYLONTECH", t: "حرّر طاقتك بشكل مستدام", d: "المورّد الرائد عالمياً لأنظمة تخزين الطاقة بالبطاريات" },
+  { id: "pylontech-fidus-battery-plus", video: "/videos/pylontech-fidus-official.mp4", poster: "/media/pylontech/hero-fidus.webp", k: "Fidus", t: "عبر الحدود، طاقة بلا حدود", d: "من 5 حتى 16 كيلوواط ساعة، توسّع حسب حاجتك" },
+  { id: "pylontech-optimus-l260-hy", video: "", poster: "/media/pylontech/hero-h3x.webp", k: "All-in-One", t: "طاقة أذكى، توفير أكبر", d: "منظومة تخزين متكاملة الكل في واحد تُحدث ثورة في تجربة التخزين" },
 ];
 
 
@@ -48,8 +48,8 @@ const AWARDS = [
 ];
 
 const CASES = [
-  { p: "أستراليا · 2025", t: "40kWh — Force H3X", img: "/media/pylontech/case-au.png" },
-  { p: "الصين · 2024", t: "تخفيف ذروة الأحمال + الاستجابة للطلب 40MW/80MWh", img: "/media/pylontech/case-cn.jpg" },
+  { p: "أستراليا · 2025", t: "40kWh — Force H3X", img: "/media/pylontech/case-au.webp" },
+  { p: "الصين · 2024", t: "تخفيف ذروة الأحمال + الاستجابة للطلب 40MW/80MWh", img: "/media/pylontech/case-cn.webp" },
   { p: "أوروبا · 2023", t: "خدمات الشبكة 400kW/432kWh", img: resBess },
 ];
 
