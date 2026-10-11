@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 const PdfPages = lazy(() => import("@/components/pdf-pages"));
 import { ArrowRight, Search, BatteryCharging, Check, ChevronDown, Container, Copy, Download, Eye, FileText, Gauge, Info, Layers, Link2, ListChecks, MessageCircle, Play, Share2, Sparkles, Sun, Users, Wrench, X, Zap } from "lucide-react";
-import QRCode from "qrcode";
 import { createPortal } from "react-dom";
 import { CATEGORIES, findProduct, matchCompatibleProducts, productsByCategory, quickSpecs, type Product, type ProductCategory, type ProductFile } from "@/lib/products-data";
 import { isVoiceOn, isVoicePlatform, prepareSpeech, silenceNextScreen, speakScreen, speakScreenAfterCurrent, stopSpeaking } from "@/lib/voice-guide";
@@ -446,7 +445,10 @@ function ShareSheet({ product, onClose }: { product: Product; onClose: () => voi
 
   useEffect(() => {
     let alive = true;
-    QRCode.toDataURL(url, { margin: 1, width: 420, color: { dark: "#0b2239", light: "#ffffff" } })
+    // رمز QR يُحمَّل عند الحاجة فقط: استيراده أعلى الملف يُدخِل مكتبة CommonJS
+    // إلى رسم الخادم (SSR) فيتعطّل ويضطر المتصفح لإعادة الرسم من الصفر.
+    import("qrcode")
+      .then((m) => (m.default ?? m).toDataURL(url, { margin: 1, width: 420, color: { dark: "#0b2239", light: "#ffffff" } }))
       .then((d) => { if (alive) setQr(d); })
       .catch(() => { if (alive) setQr(null); });
     return () => { alive = false; };
